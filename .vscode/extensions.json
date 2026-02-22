@@ -1,0 +1,18 @@
+{
+  "recommendations": [
+    "coderabbit.coderabbit-vscode",
+    "ms-azuretools.vscode-containers",
+    "ms-vscode-remote.remote-containers",
+    "waderyan.gitblame",
+    "donjayamanne.githistory",
+    "github.vscode-github-actions",
+    "codezombiech.gitignore",
+    "eamodio.gitlens",
+    "davidanson.vscode-markdownlint",
+    "christian-kohler.npm-intellisense",
+    "ms-python.vscode-pylance",
+    "ms-python.python",
+    "ms-python.debugpy",
+    "ms-python.vscode-python-envs"
+  ]
+}
