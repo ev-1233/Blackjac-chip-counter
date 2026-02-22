@@ -28,6 +28,18 @@ Scores are stored in a local SQLite database file (`scores.db`) so they persist 
 
 A separate Vite workspace was added in [frontend](frontend) so you can run fast frontend tests.
 
+You can run tests from the project root now:
+
+	npm test
+
+Run both backend + Vite dev server together:
+
+	npm run dev
+
+Run tests with backend auto-started (good for integration flow):
+
+	npm run test:with-app
+
 1. Install frontend dependencies:
 
 	cd frontend
