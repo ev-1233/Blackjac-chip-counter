@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import os
 import sqlite3
 from pathlib import Path
 
 from flask import Flask, flash, g, redirect, render_template, request, url_for
 
 BASE_DIR = Path(__file__).resolve().parent
-DATABASE = BASE_DIR / "scores.db"
+DATABASE = Path(os.getenv("DATABASE_PATH", str(BASE_DIR / "scores.db")))
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "dev-secret-key-change-me"
@@ -114,4 +115,7 @@ def reset_scores():
 
 if __name__ == "__main__":
     init_db()
-    app.run(debug=True)
+    host = os.getenv("FLASK_HOST", "127.0.0.1")
+    port = int(os.getenv("FLASK_PORT", "5000"))
+    debug = os.getenv("FLASK_DEBUG", "0") == "1"
+    app.run(host=host, port=port, debug=debug)

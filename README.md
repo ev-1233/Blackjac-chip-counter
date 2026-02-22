@@ -24,6 +24,28 @@ Scores are stored in a local SQLite database file (`scores.db`) so they persist 
 
 	http://127.0.0.1:5000
 
+## Run with Docker (recommended for sharing)
+
+Build and start:
+
+	docker compose up --build
+
+Then open:
+
+	http://127.0.0.1:5000
+
+### Notes
+
+- SQLite data is persisted in a Docker volume (`db_data`).
+- The app uses env vars for container config:
+  - `FLASK_HOST`
+  - `FLASK_PORT`
+  - `FLASK_DEBUG`
+  - `DATABASE_PATH`
+- Stop containers with:
+
+	docker compose down
+
 ## Frontend test environment (Vite + Vitest)
 
 A separate Vite workspace was added in [frontend](frontend) so you can run fast frontend tests.
