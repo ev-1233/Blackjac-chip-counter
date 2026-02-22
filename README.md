@@ -24,27 +24,30 @@ Scores are stored in a local SQLite database file (`scores.db`) so they persist 
 
 	http://127.0.0.1:5000
 
-## Run with Docker (recommended for sharing)
+## Run with Docker only (no local Python/npm install)
 
-Build and start:
+### Start backend + frontend dev server
 
-	docker compose up --build
+	docker compose up --build app frontend
 
-Then open:
+Open:
 
-	http://127.0.0.1:5000
+- Backend app: http://127.0.0.1:5000
+- Vite dev server: http://127.0.0.1:5173
+
+### Run frontend tests in Docker
+
+	docker compose run --rm frontend-test
 
 ### Notes
 
-- SQLite data is persisted in a Docker volume (`db_data`).
-- The app uses env vars for container config:
-  - `FLASK_HOST`
-  - `FLASK_PORT`
-  - `FLASK_DEBUG`
-  - `DATABASE_PATH`
-- Stop containers with:
+- SQLite data is persisted in Docker volume `db_data`.
+- Stop everything with:
 
 	docker compose down
+- If your friend only needs the Flask app, run just:
+
+	docker compose up --build app
 
 ## Frontend test environment (Vite + Vitest)
 
