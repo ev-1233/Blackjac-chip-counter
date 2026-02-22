@@ -77,3 +77,29 @@ Run tests with backend auto-started (good for integration flow):
 3. Run tests in watch mode:
 
 	npm run test:watch
+
+## License header automation (Apache-2.0 SPDX)
+
+This repo includes an SPDX header automation script.
+It enforces both `SPDX-FileCopyrightText: 2026 Evan McKeown`
+and `SPDX-License-Identifier: Apache-2.0`.
+
+- Add missing headers:
+
+	npm run license:apply
+
+- Check headers (non-zero exit if missing):
+
+	npm run license:check
+
+Optional: enforce on every commit with pre-commit:
+
+	pip install pre-commit
+	pre-commit install
+
+This repo also includes a built-in Git hook at [.githooks/pre-commit](.githooks/pre-commit)
+that auto-applies SPDX headers to staged files during commit.
+
+Enable it once per clone:
+
+	git config core.hooksPath .githooks

@@ -8,7 +8,9 @@
     "test:watch": "npm --prefix frontend run test:watch",
     "test:with-app": "start-server-and-test \"npm run backend:dev\" http://127.0.0.1:5000 \"npm test\"",
     "frontend:dev": "npm --prefix frontend run dev",
-    "frontend:build": "npm --prefix frontend run build"
+    "frontend:build": "npm --prefix frontend run build",
+    "license:apply": "python3 scripts/spdx_headers.py --apply",
+    "license:check": "python3 scripts/spdx_headers.py --check"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
