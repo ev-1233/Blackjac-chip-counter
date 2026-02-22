@@ -1,13 +1,43 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mapfile -t staged_files < <(git diff --cached --name-only --diff-filter=ACMR)
+staged_files=()
+while IFS= read -r file; do
+  [[ -n "$file" ]] && staged_files+=("$file")
+done < <(git diff --cached --name-only --diff-filter=ACMR)
 
 if [[ ${#staged_files[@]} -eq 0 ]]; then
   exit 0
 fi
 
+before_unstaged=()
+while IFS= read -r file; do
+  [[ -n "$file" ]] && before_unstaged+=("$file")
+done < <(git diff --name-only -- "${staged_files[@]}")
+
 python3 scripts/spdx_headers.py --apply "${staged_files[@]}"
 python3 scripts/spdx_headers.py --check "${staged_files[@]}"
 
-git add "${staged_files[@]}"
+after_unstaged=()
+while IFS= read -r file; do
+  [[ -n "$file" ]] && after_unstaged+=("$file")
+done < <(git diff --name-only -- "${staged_files[@]}")
+
+modified_by_hook=()
+for file in "${after_unstaged[@]}"; do
+  was_unstaged_before=false
+  for before_file in "${before_unstaged[@]}"; do
+    if [[ "$file" == "$before_file" ]]; then
+      was_unstaged_before=true
+      break
+    fi
+  done
+
+  if [[ "$was_unstaged_before" == false ]]; then
+    modified_by_hook+=("$file")
+  fi
+done
+
+if [[ ${#modified_by_hook[@]} -gt 0 ]]; then
+  git add "${modified_by_hook[@]}"
+fi

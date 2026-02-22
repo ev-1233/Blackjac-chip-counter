@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
-from __future__ import annotations
-
 # SPDX-FileCopyrightText: 2026 Evan McKeown
 # SPDX-License-Identifier: Apache-2.0
 
+from __future__ import annotations
+
+
 import argparse
+import os
+from datetime import date
 from pathlib import Path
 
-COPYRIGHT_TOKEN = "SPDX-FileCopyrightText: 2026 Evan McKeown"
+COPYRIGHT_YEAR = os.getenv("SPDX_YEAR", str(date.today().year))
+COPYRIGHT_OWNER = os.getenv("SPDX_COPYRIGHT_OWNER", "Evan McKeown")
+COPYRIGHT_TOKEN = f"SPDX-FileCopyrightText: {COPYRIGHT_YEAR} {COPYRIGHT_OWNER}"
 LICENSE_TOKEN = "SPDX-License-Identifier: Apache-2.0"
+
 
 HEADER_LINES_BY_SUFFIX = {
     ".py": [f"# {COPYRIGHT_TOKEN}", f"# {LICENSE_TOKEN}"],
@@ -41,43 +47,70 @@ def _insertion_index_for_python(lines: list[str]) -> int:
     return index
 
 
+def _insertion_index(path: Path, lines: list[str]) -> int:
+    if path.suffix == ".py":
+        return _insertion_index_for_python(lines)
+    if path.suffix == ".html" and lines and lines[0].strip().lower().startswith("<!doctype html"):
+        return 1
+    return 0
+
+
 def add_header(path: Path) -> bool:
     header_lines = HEADER_LINES_BY_SUFFIX.get(path.suffix)
     if not header_lines:
         return False
 
     original = path.read_text(encoding="utf-8")
-    first_lines = "\n".join(original.splitlines()[:12])
-    has_copyright = COPYRIGHT_TOKEN in first_lines
-    has_license = LICENSE_TOKEN in first_lines
-    if has_copyright and has_license:
+    lines = original.splitlines()
+    header_line_set = {line.strip() for line in header_lines}
+
+    # Remove existing SPDX token lines so we can reinsert a canonical adjacent pair.
+    lines_without_tokens = [
+        line
+        for line in lines
+        if line.strip() not in header_line_set
+    ]
+
+    insert_at = _insertion_index(path, lines_without_tokens)
+
+    # Drop blank lines at insertion point to avoid accumulating spacing.
+    while insert_at < len(lines_without_tokens) and not lines_without_tokens[insert_at].strip():
+        lines_without_tokens.pop(insert_at)
+
+    header_block = [header_lines[0], header_lines[1]]
+    if insert_at < len(lines_without_tokens) and lines_without_tokens[insert_at].strip():
+        header_block.append("")
+
+    new_lines = (
+        lines_without_tokens[:insert_at]
+        + header_block
+        + lines_without_tokens[insert_at:]
+    )
+    updated = "\n".join(new_lines).rstrip("\n") + "\n"
+
+    normalized_original = original.rstrip("\n") + "\n"
+    if updated == normalized_original:
         return False
 
-    missing_lines: list[str] = []
-    if not has_copyright:
-        missing_lines.append(header_lines[0])
-    if not has_license:
-        missing_lines.append(header_lines[1])
-
-    lines = original.splitlines()
-    insert_at = 0
-
-    if path.suffix == ".py":
-        insert_at = _insertion_index_for_python(lines)
-    elif path.suffix == ".html":
-        if lines and lines[0].strip().lower().startswith("<!doctype html"):
-            insert_at = 1
-
-    new_lines = lines[:insert_at] + missing_lines + [""] + lines[insert_at:]
-    updated = "\n".join(new_lines).rstrip("\n") + "\n"
     path.write_text(updated, encoding="utf-8")
     return True
 
 
 def is_missing_header(path: Path) -> bool:
-    original = path.read_text(encoding="utf-8")
-    first_lines = "\n".join(original.splitlines()[:12])
-    return COPYRIGHT_TOKEN not in first_lines or LICENSE_TOKEN not in first_lines
+    header_lines = HEADER_LINES_BY_SUFFIX.get(path.suffix)
+    if not header_lines:
+        return False
+
+    lines = path.read_text(encoding="utf-8").splitlines()
+    insert_at = _insertion_index(path, lines)
+
+    if len(lines) <= insert_at + 1:
+        return True
+
+    return not (
+        lines[insert_at] == header_lines[0]
+        and lines[insert_at + 1] == header_lines[1]
+    )
 
 
 def normalize_paths(root: Path, raw_paths: list[str]) -> list[Path]:
