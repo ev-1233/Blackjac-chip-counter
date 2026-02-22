@@ -24,20 +24,19 @@ Scores are stored in a local SQLite database file (`scores.db`) so they persist 
 
 	http://127.0.0.1:5000
 
+Optional (same thing via npm script):
+
+	npm run dev
+
 ## Run with Docker only (no local Python/npm install)
 
-### Start backend + frontend dev server
+### Start app
 
-	docker compose up --build app frontend
+	docker compose up --build app
 
 Open:
 
 - Backend app: http://127.0.0.1:5000
-- Vite dev server: http://127.0.0.1:5173
-
-### Run frontend tests in Docker
-
-	docker compose run --rm frontend-test
 
 ### Notes
 
@@ -45,38 +44,6 @@ Open:
 - Stop everything with:
 
 	docker compose down
-- If your friend only needs the Flask app, run just:
-
-	docker compose up --build app
-
-## Frontend test environment (Vite + Vitest)
-
-A separate Vite workspace was added in [frontend](frontend) so you can run fast frontend tests.
-
-You can run tests from the project root now:
-
-	npm test
-
-Run both backend + Vite dev server together:
-
-	npm run dev
-
-Run tests with backend auto-started (good for integration flow):
-
-	npm run test:with-app
-
-1. Install frontend dependencies:
-
-	cd frontend
-	npm install
-
-2. Run tests once:
-
-	npm test
-
-3. Run tests in watch mode:
-
-	npm run test:watch
 
 ## License header automation (Apache-2.0 SPDX)
 
