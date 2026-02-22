@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Score Tracker</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        margin: 2rem auto;
+        max-width: 760px;
+        padding: 0 1rem;
+      }
+
+      h1 {
+        margin-bottom: 0.5rem;
+      }
+
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+      }
+
+      .card {
+        border: 1px solid #6666;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 0.75rem 0;
+      }
+
+      input[type='text'],
+      input[type='number'] {
+        padding: 0.4rem 0.5rem;
+      }
+
+      button {
+        cursor: pointer;
+        padding: 0.4rem 0.6rem;
+      }
+
+      .flash {
+        border-left: 4px solid #5b9;
+        padding: 0.5rem 0.75rem;
+        margin: 0.5rem 0;
+        background: #5b91;
+      }
+
+      .score {
+        font-size: 1.25rem;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Simple Score Tracker</h1>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="flash">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <section class="card">
+      <h2>Add player</h2>
+      <form class="row" method="post" action="{{ url_for('add_player') }}">
+        <input type="text" name="name" placeholder="Player name" required />
+        <button type="submit">Add</button>
+      </form>
+    </section>
+
+    <section class="row" style="justify-content: space-between; margin-top: 1rem">
+      <h2 style="margin: 0">Players</h2>
+      <form method="post" action="{{ url_for('reset_scores') }}">
+        <button type="submit">Reset all scores</button>
+      </form>
+    </section>
+
+    {% if players %}
+      {% for player in players %}
+        <article class="card">
+          <div class="row" style="justify-content: space-between">
+            <div>
+              <div><strong>{{ player.name }}</strong></div>
+              <div class="score">{{ player.score }}</div>
+            </div>
+
+            <form class="row" method="post" action="{{ url_for('update_score', player_id=player.id) }}">
+              <input type="number" name="delta" value="1" step="1" required />
+              <button type="submit">Apply change</button>
+            </form>
+          </div>
+
+          <form method="post" action="{{ url_for('delete_player', player_id=player.id) }}" style="margin-top: 0.75rem">
+            <button type="submit">Remove player</button>
+          </form>
+        </article>
+      {% endfor %}
+    {% else %}
+      <p>No players yet. Add one above.</p>
+    {% endif %}
+  </body>
+</html>
