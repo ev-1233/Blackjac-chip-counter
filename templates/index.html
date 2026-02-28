@@ -71,43 +71,91 @@
       {% endif %}
     {% endwith %}
 
-    <section class="card">
-      <h2>Add player</h2>
-      <form class="row" method="post" action="{{ url_for('add_player') }}">
-        <input type="text" name="name" placeholder="Player name" required />
-        <button type="submit">Add</button>
-      </form>
-    </section>
+    {% if not game_started %}
+      <section class="card">
+        <h2>Setup game</h2>
+        <p>Add all players and their starting score, then start the game.</p>
+        <form class="row" method="post" action="{{ url_for('add_player') }}">
+          <input type="text" name="name" placeholder="Player name" required />
+          <input type="number" name="starting_score" value="0" step="1" required />
+          <button type="submit">Add player</button>
+        </form>
+      </section>
 
-    <section class="row" style="justify-content: space-between; margin-top: 1rem">
-      <h2 style="margin: 0">Players</h2>
-      <form method="post" action="{{ url_for('reset_scores') }}">
-        <button type="submit">Reset all scores</button>
-      </form>
-    </section>
+      <section class="row" style="justify-content: space-between; margin-top: 1rem">
+        <h2 style="margin: 0">Players</h2>
+        <div class="row">
+          <form method="post" action="{{ url_for('reset_scores') }}">
+            <button type="submit">Reset all scores</button>
+          </form>
+          <form method="post" action="{{ url_for('start_game') }}">
+            <button type="submit" {% if not players %}disabled{% endif %}>Start game</button>
+          </form>
+        </div>
+      </section>
 
-    {% if players %}
+      {% if players %}
+        {% for player in players %}
+          <article class="card">
+            <div class="row" style="justify-content: space-between">
+              <div>
+                <div><strong>{{ player.name }}</strong></div>
+                <div class="score">{{ player.score }}</div>
+              </div>
+
+              <form method="post" action="{{ url_for('delete_player', player_id=player.id) }}">
+                <button type="submit">Remove player</button>
+              </form>
+            </div>
+          </article>
+        {% endfor %}
+      {% else %}
+        <p>No players yet. Add players above.</p>
+      {% endif %}
+    {% else %}
+      <section class="card">
+        <h2>Game in progress</h2>
+        {% if current_player %}
+          <p>
+            Current turn: <strong>{{ current_player.name }}</strong>
+            (score: {{ current_player.score }})
+          </p>
+          <form class="row" method="post" action="{{ url_for('update_turn_score') }}">
+            <input type="number" name="delta" value="1" step="1" required />
+            <button type="submit">Apply and next turn</button>
+          </form>
+        {% else %}
+          <p>No current player. End and restart the game.</p>
+        {% endif %}
+      </section>
+
+      <section class="row" style="justify-content: space-between; margin-top: 1rem">
+        <h2 style="margin: 0">Scoreboard</h2>
+        <div class="row">
+          <form method="post" action="{{ url_for('reset_scores') }}">
+            <button type="submit">Reset all scores</button>
+          </form>
+          <form method="post" action="{{ url_for('end_game') }}">
+            <button type="submit">End game</button>
+          </form>
+        </div>
+      </section>
+
       {% for player in players %}
         <article class="card">
           <div class="row" style="justify-content: space-between">
             <div>
-              <div><strong>{{ player.name }}</strong></div>
+              <div>
+                <strong>{{ player.name }}</strong>
+                {% if current_player and current_player.id == player.id %}
+                  <span>← current</span>
+                {% endif %}
+              </div>
               <div class="score">{{ player.score }}</div>
             </div>
-
-            <form class="row" method="post" action="{{ url_for('update_score', player_id=player.id) }}">
-              <input type="number" name="delta" value="1" step="1" required />
-              <button type="submit">Apply change</button>
-            </form>
           </div>
-
-          <form method="post" action="{{ url_for('delete_player', player_id=player.id) }}" style="margin-top: 0.75rem">
-            <button type="submit">Remove player</button>
-          </form>
         </article>
       {% endfor %}
-    {% else %}
-      <p>No players yet. Add one above.</p>
     {% endif %}
   </body>
 </html>
