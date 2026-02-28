@@ -9,6 +9,23 @@ This project is now a simple Flask app that lets you:
 
 Scores are stored in a local SQLite database file (`scores.db`) so they persist between runs.
 
+## Dev Container (recommended for contributors)
+
+This repo includes a VS Code Dev Container at [.devcontainer/devcontainer.json](.devcontainer/devcontainer.json).
+
+You only need Docker + VS Code (with Dev Containers extension). No local Python, pip, Flask, Node, or npm setup is required.
+
+1. Open the repo in VS Code.
+2. Run **Dev Containers: Reopen in Container**.
+3. Wait for first-time setup to finish (it creates `.venv`, installs Python deps, and runs `npm install`).
+4. Start the app:
+
+	npm run dev
+
+5. Open:
+
+	http://127.0.0.1:5000
+
 ## Run locally
 
 1. Create and activate a virtual environment.
