@@ -169,14 +169,41 @@
               formInputObj.value = pendingDelta;
             }
 
-            function adjustPending(amount) {
-              pendingDelta += amount;
-              updateDisplay();
+            // Notice we added "async" so we can securely wait for Python to respond via the network
+            async function adjustPending(amount) {
+              try {
+                // Instead of local math, we ask Python to do the math by pinging an invisible API route
+                const response = await fetch("{{ url_for('calculate_logic') }}", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json"
+                  },
+                  // We send both the current local state AND the new button amount to Python
+                  body: JSON.stringify({
+                    current: pendingDelta,
+                    amount: amount
+                  })
+                });
+                
+                // Wait for Python to calculate and send the JSON answer back
+                const data = await response.json();
+                
+                // Python sends back the mathematically validated total in the "result" field!
+                pendingDelta = data.result;
+                
+                // Update the visual display colors and hidden form
+                updateDisplay();
+              } catch (error) {
+                console.error("Error communicating with Python math logic:", error);
+                alert("Failed to calculate score. Check network connection.");
+              }
             }
             
             function resetPending() {
-              pendingDelta = 0;
-              updateDisplay();
+              // We can reset by simply subtracting the 'pendingDelta' from itself out using our Python API.
+              if (pendingDelta !== 0) {
+                adjustPending(-pendingDelta);
+              }
             }
           </script>
         {% else %}

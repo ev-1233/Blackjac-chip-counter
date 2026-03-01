@@ -757,6 +757,28 @@ def reset_scores():
     return redirect(url_for("index"))
 
 
+@app.post("/api/calculate")
+def calculate_logic():
+    """API endpoint that strictly handles the math in Python based on local variables.
+    Receives JSON from JS: {"current": 5, "amount": 10}
+    Returns JSON to JS: {"result": 15}
+    """
+    # Read the JSON payload sent by the JavaScript fetch() command
+    data = request.get_json()
+    current = int(data.get("current", 0))
+    amount = int(data.get("amount", 0))
+    
+    # ---
+    # Here is where you can add much more advanced Python math logic in the future! 
+    # (e.g., multipliers, applying special chip rules, checking complex constraints)
+    # ---
+    new_total = current + amount
+    
+    # Return the JSON response back to the JavaScript frontend.
+    # Flask automatically converts standard Python dictionaries into JSON text.
+    return {"result": new_total}
+
+
 # Execute our initialize database function as soon as this Python module is loaded.
 # This ensures that empty .db files get built automatically before a single web request comes in.
 init_db()
