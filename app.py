@@ -502,7 +502,7 @@ def add_player():
 
 @app.post("/game/start")
 def start_game():
-    """Sets the game state to 'started' so calculating scores and taking turns can begin."""
+    #Sets the game state to 'started' so calculating scores and taking turns can begin.
     db = get_db()
     owner_id = get_owner_id()
     prune_expired_games(db)

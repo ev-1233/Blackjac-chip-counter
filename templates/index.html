@@ -118,12 +118,67 @@
         {% if current_player %}
           <p>
             Current turn: <strong>{{ current_player.name }}</strong>
-            (score: {{ current_player.score }})
+            (current score: {{ current_player.score }})
           </p>
+          
+          <!-- Local math display -->
+          <div style="font-size: 1.25rem; margin-bottom: 1rem; padding: 0.5rem; background: #8882; border-radius: 5px;">
+            Pending Change: <strong id="pending-display">0</strong>
+          </div>
+
+          <!-- Quick adjustment buttons -->
+          <div class="row" style="margin-bottom: 1rem;">
+            <button type="button" onclick="adjustPending(-10)">-10</button>
+            <button type="button" onclick="adjustPending(-5)">-5</button>
+            <button type="button" onclick="adjustPending(-1)">-1</button>
+            <button type="button" onclick="resetPending()">Clear</button>
+            <button type="button" onclick="adjustPending(1)">+1</button>
+            <button type="button" onclick="adjustPending(5)">+5</button>
+            <button type="button" onclick="adjustPending(10)">+10</button>
+          </div>
+
+          <!-- Form that actually targets Python -->
           <form class="row" method="post" action="{{ url_for('update_turn_score') }}">
-            <input type="number" name="delta" value="1" step="1" required />
-            <button type="submit">Apply and next turn</button>
+            <!-- We hide the actual input from the user since the buttons control it now -->
+            <input type="hidden" id="final-delta" name="delta" value="0" />
+            <button style="background: #4a4; color: white; border: none; font-weight: bold; padding: 0.75rem 1rem;" type="submit">Submit Turn</button>
           </form>
+          
+          <script>
+            // This JavaScript runs locally in the browser memory
+            let pendingDelta = 0; // Our temporary local variable
+            
+            function updateDisplay() {
+              // Get references to our HTML text and our hidden form input
+              const displayObj = document.getElementById('pending-display');
+              const formInputObj = document.getElementById('final-delta');
+              
+              // Formatting: Add a plus sign to positive numbers
+              if (pendingDelta > 0) {
+                displayObj.innerText = "+" + pendingDelta;
+                displayObj.style.color = "#4a4"; // Green for positive
+              } else if (pendingDelta < 0) {
+                displayObj.innerText = pendingDelta;
+                displayObj.style.color = "#d44"; // Red for negative
+              } else {
+                displayObj.innerText = "0";
+                displayObj.style.color = "inherit"; // Normal color for zero
+              }
+              
+              // Crucially, update the hidden form field that Python will eventually read
+              formInputObj.value = pendingDelta;
+            }
+
+            function adjustPending(amount) {
+              pendingDelta += amount;
+              updateDisplay();
+            }
+            
+            function resetPending() {
+              pendingDelta = 0;
+              updateDisplay();
+            }
+          </script>
         {% else %}
           <p>No current player. End and restart the game.</p>
         {% endif %}
