@@ -128,13 +128,11 @@
 
           <!-- Quick adjustment buttons -->
           <div class="row" style="margin-bottom: 1rem;">
-            <button type="button" onclick="adjustPending(-10)">-10</button>
-            <button type="button" onclick="adjustPending(-5)">-5</button>
-            <button type="button" onclick="adjustPending(-1)">-1</button>
-            <button type="button" onclick="resetPending()">Clear</button>
-            <button type="button" onclick="adjustPending(1)">+1</button>
-            <button type="button" onclick="adjustPending(5)">+5</button>
-            <button type="button" onclick="adjustPending(10)">+10</button>
+            <button type="button" onclick="triggerAction('hit')">-Hit</button>
+            <button type="button" onclick="triggerAction('stand')">Stand</button>
+            <button type="button" onclick="triggerAction('double')">double</button>
+            <button type="button" onclick="triggerAction('surrender')">Surrender</button>
+            <button type="button" onclick="triggerAction('split')">split</button>
           </div>
 
           <!-- Form that actually targets Python -->
@@ -169,19 +167,19 @@
               formInputObj.value = pendingDelta;
             }
 
-            // Notice we added "async" so we can securely wait for Python to respond via the network
-            async function adjustPending(amount) {
+            // Notice we pass an "action" string now, not an amount!
+            async function triggerAction(actionName) {
               try {
-                // Instead of local math, we ask Python to do the math by pinging an invisible API route
+                // Instead of local math, we tell Python exactly which button was clicked
                 const response = await fetch("{{ url_for('calculate_logic') }}", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json"
                   },
-                  // We send both the current local state AND the new button amount to Python
+                  // We send both the current local state AND the specific action name
                   body: JSON.stringify({
                     current: pendingDelta,
-                    amount: amount
+                    action: actionName
                   })
                 });
                 
@@ -194,15 +192,8 @@
                 // Update the visual display colors and hidden form
                 updateDisplay();
               } catch (error) {
-                console.error("Error communicating with Python math logic:", error);
+                console.error("Error communicating with Python logic:", error);
                 alert("Failed to calculate score. Check network connection.");
-              }
-            }
-            
-            function resetPending() {
-              // We can reset by simply subtracting the 'pendingDelta' from itself out using our Python API.
-              if (pendingDelta !== 0) {
-                adjustPending(-pendingDelta);
               }
             }
           </script>

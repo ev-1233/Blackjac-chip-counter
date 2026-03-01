@@ -8,6 +8,7 @@ import os           # Used for interacting with the operating system, like readi
 import sqlite3      # The built-in library for interacting with SQLite databases
 import time         # Used for time-related operations (like timestamps for tracking inactivity)
 import uuid         # Used for generating unique identifiers (UUIDs), specifically for anonymous user sessions
+import secrets      # Used for generating cryptographically secure random strings
 from pathlib import Path # Used for robust file and directory path management (object-oriented paths)
 
 # Import necessary components from the Flask framework:
@@ -39,10 +40,10 @@ app = Flask(__name__)
 
 # Fetch the secret key from the environment. The secret key is essential! 
 # It is used by Flask to cryptographically sign session cookies, preventing users from tampering with their session data.
-secret_key = os.getenv("SECRET_KEY")
-if not secret_key:
-    # If the app starts without a secret key, crash immediately with a clear error message.
-    raise RuntimeError("SECRET_KEY environment variable is required.")
+# If not provided, we generate a random secure token using `secrets.token_hex()`
+# Warning: Generating a new token on every restart means active user sessions will be invalidated when the server reboots!
+secret_key = os.getenv("SECRET_KEY", secrets.token_hex(32))
+
 # Apply the securely fetched secret key to the app's configuration.
 app.config["SECRET_KEY"] = secret_key
 
@@ -760,22 +761,44 @@ def reset_scores():
 @app.post("/api/calculate")
 def calculate_logic():
     """API endpoint that strictly handles the math in Python based on local variables.
-    Receives JSON from JS: {"current": 5, "amount": 10}
+    Receives JSON from JS with the specific button pressed, e.g.: {"action": "add_5", "current": 10}
     Returns JSON to JS: {"result": 15}
     """
-    # Read the JSON payload sent by the JavaScript fetch() command
     data = request.get_json()
     current = int(data.get("current", 0))
-    amount = int(data.get("amount", 0))
+    action = data.get("action", "")
     
     # ---
-    # Here is where you can add much more advanced Python math logic in the future! 
-    # (e.g., multipliers, applying special chip rules, checking complex constraints)
+    # Action-based routing! 
+    # Respond differently depending on the specific button pressed.
     # ---
-    new_total = current + amount
+    new_total = current
     
-    # Return the JSON response back to the JavaScript frontend.
-    # Flask automatically converts standard Python dictionaries into JSON text.
+    if action == "hit":
+        new_total = current
+        #promt to check if bust
+        
+    elif action == "stand":
+        new_total = current
+        #promt to check if bust
+        
+    elif action == "double":
+        new_total = current * 2
+        
+    elif action == "surrender":
+        new_total = 0
+        
+    elif action == "split":
+        #add split logic here
+
+        
+    # --- Additional Advanced Rules could go here ---
+    # elif action == "double_down":
+    #     new_total = current * 2
+    # elif action == "split":
+    #     new_total = current / 2
+    # -----------------------------------------------
+    
     return {"result": new_total}
 
 
