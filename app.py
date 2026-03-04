@@ -780,24 +780,22 @@ def calculate_logic():
         
     elif action == "stand":
         new_total = current
-        #promt to check if bust
+        #end trun
         
     elif action == "double":
         new_total = current * 2
-        
+        #promt to check if bust
+
+        #TODO: Implement logic to only allow doubling on the first turn if specifed by deler, and only if the player has enough chips to double.
+
     elif action == "surrender":
-        new_total = 0
-        
+        new_total = current / 2  
+        #end turn 
+
     elif action == "split":
         #add split logic here
-
+        new_total = current
         
-    # --- Additional Advanced Rules could go here ---
-    # elif action == "double_down":
-    #     new_total = current * 2
-    # elif action == "split":
-    #     new_total = current / 2
-    # -----------------------------------------------
     
     return {"result": new_total}
 
