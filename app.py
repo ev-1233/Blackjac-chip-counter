@@ -776,15 +776,16 @@ def calculate_logic():
     
     if action == "hit":
         new_total = current
-        #promt to check if bust
+        prompt_to_check_if_bust = True
         
     elif action == "stand":
         new_total = current
-        #end trun
+        end_turn = True
+        prompt_to_check_if_bust = False
         
     elif action == "double":
         new_total = current * 2
-        #promt to check if bust
+        prompt_to_check_if_bust = True
 
         #TODO: Implement logic to only allow doubling on the first turn if specifed by deler, and only if the player has enough chips to double.
 
@@ -796,8 +797,13 @@ def calculate_logic():
         #add split logic here
         new_total = current
         
-    
-    return {"result": new_total}
+    if prompt_to_check_if_bust:
+        return jsonify({
+            "result": calculated_amount, 
+            "ask_bust": True
+        })
+    else:
+        return jsonify({"result": calculated_amount})
 
 
 # Execute our initialize database function as soon as this Python module is loaded.

@@ -186,6 +186,14 @@
                 // Wait for Python to calculate and send the JSON answer back
                 const data = await response.json();
                 
+                if (data.ask_bust) {
+                  const isBust = confirm("Did the player bust?");
+                  if (isBust) { // They clicked OK
+                    // Do something if they busted (e.g., reset bet, end turn)
+                    console.log("Player is bust.");
+                  }
+                }
+
                 // Python sends back the mathematically validated total in the "result" field!
                 pendingDelta = data.result;
                 
