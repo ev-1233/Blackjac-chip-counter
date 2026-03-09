@@ -20,7 +20,7 @@ from pathlib import Path # Used for robust file and directory path management (o
 # request: Contains all the data the user sent with their HTTP request (URL parameters, form data, etc.)
 # session: A secure, encrypted cookie that stores data across different requests from the exact same user/browser
 # url_for: Automatically generates URLs for specific functions, preventing hardcoded paths
-from flask import Flask, flash, g, redirect, render_template, request, session, url_for
+from flask import Flask, flash, g, redirect, render_template, request, session, url_for, jsonify
 
 # Define the absolute path to the directory containing this script
 BASE_DIR = Path(__file__).resolve().parent
