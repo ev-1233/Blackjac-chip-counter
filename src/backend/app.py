@@ -16,17 +16,17 @@ from pathlib import Path # Used for robust file and directory path management (o
 # flash: Used to store messages (like "Added player") that are shown to the user on the next page load
 # g: A special object that stores data globally but *only* for the duration of a single web request (good for holding the DB connection)
 # redirect: Used to send the user's browser to a different URL (e.g., after submitting a form)
-# render_template: Used to load HTML files from the `templates/` folder and inject dynamic variables
+# render_template: Used to load HTML files from the `src/` folder and inject dynamic variables
 # request: Contains all the data the user sent with their HTTP request (URL parameters, form data, etc.)
 # session: A secure, encrypted cookie that stores data across different requests from the exact same user/browser
 # url_for: Automatically generates URLs for specific functions, preventing hardcoded paths
 from flask import Flask, flash, g, redirect, render_template, request, session, url_for, jsonify
 
-# Define the absolute path to the directory containing this script
-BASE_DIR = Path(__file__).resolve().parent
+# Define the absolute path to the project root directory (go up 3 levels from src/backend/app.py)
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Define the path to the internal SQLite database file. 
-# It checks if there's an environment variable 'DATABASE_PATH' and uses it; if not, defaults to 'scores.db' in the base folder.
+# It checks if there's an environment variable 'DATABASE_PATH' and uses it; if not, defaults to 'scores.db' in the project root folder.
 DATABASE = Path(os.getenv("DATABASE_PATH", str(BASE_DIR / "scores.db")))
 
 # Define "Time To Live" (TTL) for games. If a game is inactive for this many days, it gets deleted to save space.
@@ -35,8 +35,9 @@ GAME_TTL_DAYS = int(os.getenv("GAME_TTL_DAYS", "30"))
 # Convert the TTL from days into seconds, because time.time() works in seconds.
 GAME_TTL_SECONDS = GAME_TTL_DAYS * 24 * 60 * 60
 
-# Initialize the Flask web application
-app = Flask(__name__)
+# Initialize the Flask web application with custom template folder
+# The template_folder points to ../src/ (one level up from backend/)
+app = Flask(__name__, template_folder="../")
 
 # Fetch the secret key from the environment. The secret key is essential! 
 # It is used by Flask to cryptographically sign session cookies, preventing users from tampering with their session data.
