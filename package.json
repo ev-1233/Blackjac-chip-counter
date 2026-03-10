@@ -2,7 +2,7 @@
   "name": "blackjack-chip-counter",
   "private": true,
   "scripts": {
-    "backend:dev": "./.venv/bin/python app.py",
+    "backend:dev": "./.venv/bin/python src/backend/app.py",
     "dev": "npm run backend:dev",
     "license:apply": "python3 scripts/spdx_headers.py --apply",
     "license:check": "python3 scripts/spdx_headers.py --check"

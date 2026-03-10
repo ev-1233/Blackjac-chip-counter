@@ -43,7 +43,7 @@ You only need Docker + VS Code (with Dev Containers extension). No local Python,
 
 4. Start the app:
 
-	python app.py
+	python src/backend/app.py
 
 5. Open the app in your browser:
 
