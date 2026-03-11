@@ -7,58 +7,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Score Tracker</title>
-    <style>
-      :root {
-        color-scheme: light dark;
-      }
-
-      body {
-        font-family: Arial, sans-serif;
-        margin: 2rem auto;
-        max-width: 760px;
-        padding: 0 1rem;
-      }
-
-      h1 {
-        margin-bottom: 0.5rem;
-      }
-
-      .row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        align-items: center;
-      }
-
-      .card {
-        border: 1px solid #6666;
-        border-radius: 10px;
-        padding: 1rem;
-        margin: 0.75rem 0;
-      }
-
-      input[type='text'],
-      input[type='number'] {
-        padding: 0.4rem 0.5rem;
-      }
-
-      button {
-        cursor: pointer;
-        padding: 0.4rem 0.6rem;
-      }
-
-      .flash {
-        border-left: 4px solid #5b9;
-        padding: 0.5rem 0.75rem;
-        margin: 0.5rem 0;
-        background: #5b91;
-      }
-
-      .score {
-        font-size: 1.25rem;
-        font-weight: bold;
-      }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
   </head>
   <body>
     <h1>Blackjac chip tracker</h1>
@@ -143,68 +92,9 @@
           </form>
           
           <script>
-            // This JavaScript runs locally in the browser memory
-            let pendingDelta = 0; // Our temporary local variable
-            
-            function updateDisplay() {
-              // Get references to our HTML text and our hidden form input
-              const displayObj = document.getElementById('pending-display');
-              const formInputObj = document.getElementById('final-delta');
-              
-              // Formatting: Add a plus sign to positive numbers
-              if (pendingDelta > 0) {
-                displayObj.innerText = "+" + pendingDelta;
-                displayObj.style.color = "#4a4"; // Green for positive
-              } else if (pendingDelta < 0) {
-                displayObj.innerText = pendingDelta;
-                displayObj.style.color = "#d44"; // Red for negative
-              } else {
-                displayObj.innerText = "0";
-                displayObj.style.color = "inherit"; // Normal color for zero
-              }
-              
-              // Crucially, update the hidden form field that Python will eventually read
-              formInputObj.value = pendingDelta;
-            }
-
-            // Notice we pass an "action" string now, not an amount!
-            async function triggerAction(actionName) {
-              try {
-                // Instead of local math, we tell Python exactly which button was clicked
-                const response = await fetch("{{ url_for('calculate_logic') }}", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json"
-                  },
-                  // We send both the current local state AND the specific action name
-                  body: JSON.stringify({
-                    current: pendingDelta,
-                    action: actionName
-                  })
-                });
-                
-                // Wait for Python to calculate and send the JSON answer back
-                const data = await response.json();
-                
-                if (data.ask_bust) {
-                  const isBust = confirm("Did the player bust?");
-                  if (isBust) { // They clicked OK
-                    // Do something if they busted (e.g., reset bet, end turn)
-                    console.log("Player is bust.");
-                  }
-                }
-
-                // Python sends back the mathematically validated total in the "result" field!
-                pendingDelta = data.result;
-                
-                // Update the visual display colors and hidden form
-                updateDisplay();
-              } catch (error) {
-                console.error("Error communicating with Python logic:", error);
-                alert("Failed to calculate score. Check network connection.");
-              }
-            }
+            window.CALCULATE_LOGIC_URL = "{{ url_for('calculate_logic') }}";
           </script>
+          <script src="{{ url_for('static', filename='script.js') }}"></script>
         {% else %}
           <p>No current player. End and restart the game.</p>
         {% endif %}

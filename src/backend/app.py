@@ -36,8 +36,8 @@ GAME_TTL_DAYS = int(os.getenv("GAME_TTL_DAYS", "30"))
 GAME_TTL_SECONDS = GAME_TTL_DAYS * 24 * 60 * 60
 
 # Initialize the Flask web application with custom template folder
-# The template_folder points to ../src/ (one level up from backend/)
-app = Flask(__name__, template_folder="../")
+# The template_folder points to ../Frontend/
+app = Flask(__name__, template_folder="../Frontend", static_folder="../Frontend")
 
 # Fetch the secret key from the environment. The secret key is essential! 
 # It is used by Flask to cryptographically sign session cookies, preventing users from tampering with their session data.
