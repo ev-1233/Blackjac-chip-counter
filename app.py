@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent
 DATABASE = Path(os.getenv("DATABASE_PATH", str(BASE_DIR / "scores.db")))
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "dev-secret-key-change-me"
+app.config["SECRET_KEY"] = "super-secret-key-frfr"
 
 
 def get_db() -> sqlite3.Connection:
